@@ -214,3 +214,11 @@ components:
           type: integer
         authorID:
           type: integer
+
+# 4-a Oui, on peut gérer la pagination à travers les entêtes de la requête 
+# mais cette action n'est pas conseiller pour améliorer l'expérience l'utilisateur. 
+
+# 4-b Utiliser les entêtes de requête pour la pagination n'est pas 
+# nécessaire car les paramètres de requête sont plus simples et efficaces. 
+# Les entêtes sont utiles dans des cas spécifiques mais peuvent 
+# compliquer l'expérience utilisateur. Il est préférable d'utilser les paramètres de requête pour la pagination.
