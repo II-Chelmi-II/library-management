@@ -1,13 +1,15 @@
 openapi: 3.0.3
 info:
   title: Library API
-  version: 1.0.0
+  version: 1.0.1
   description: STD22001
 servers:
   - url: https://library.com
 paths:
   /books:
     get:
+      tags:
+        - "Book"
       summary: Get all books
       description: The returned books are ordered by updated datetime.
       operationId: getBooks
@@ -18,7 +20,6 @@ paths:
           required: false
           schema:
             type: string
-        #TODO3: add parameter to filter books by intervals of dates of the releaseDate
         - in: query
           name: releaseDateInterval
           description: Filter books by release date interval
@@ -32,6 +33,20 @@ paths:
               max:
                 type: string
                 format: date
+        - in: query
+          name: page
+          description: Page number for pagination 
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            default: 50
       responses:
         200:
           description: The list of filtered books
@@ -42,6 +57,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Book'
     put:
+      tags:
+        - "Book"
       summary: Create or update a list of books
       operationId: crupdateBooks
       requestBody:
@@ -60,9 +77,48 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
+  /books/{bookId}/authors/{authorId}:
+    put:
+      tags:
+        - "Book"
+      description: Associate a single book to an author
+      parameters:
+        - name: bookId
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: authorId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: The updated book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+  /books/authors:
+    put:
+      summary: Update Book authors
+      description: Update the authors of multiple books
+      requestBody: 
+        required: true
+        content:
+            application/json:
+              schema: 
+               type: array
+               items:
+                $ref: '#/components/schemas/UpdateBookAuthor'
+      responses:
+        '200': 
+          description: Authors updated successfully
   /authors:
-  #TODO2: complete GET (can be filtered by name) - PUT - DELETE
     get:
+      tags:
+        - "Author"
       summary: Get authors
       description: The returned authors filtered by name.
       operationId: getAuthors
@@ -83,6 +139,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Author'
     put:
+      tags:
+        - "Author"
       summary: Update authors
       description: Update the list of authors
       operationId: updateAuthors
@@ -103,6 +161,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Author'
     delete:
+      tags:
+        - "Author"
       summary: Delete authors
       description: Delete authors from the list
       operationId: deleteAuthors
@@ -111,26 +171,13 @@ paths:
           description: Authors deleted successfully
 components:
   schemas:
-    Book:
+    crupdateBook:
       type: object
       properties:
         id:
           type: string
         bookName:
           type: string
-        author:
-          #TODO1: set it as a component with properties : id, name, sex (M or F)
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-            sex: 
-              type: string
-              enum:
-                - M
-                - F
         pageNumbers:
           type: integer
         topic:
@@ -142,6 +189,12 @@ components:
         releaseDate:
           type: string
           format: date
+    Book:
+      allOf:
+        - $ref: '#/components/schemas/crupdateBook'
+      properties:
+        author:
+          $ref: '#/components/schemas/Author'
     Author:
       type: object
       properties:
@@ -154,3 +207,10 @@ components:
           enum:
             - M
             - F
+    UpdateBookAuthor:
+      type: object
+      properties:
+        bookID:
+          type: integer
+        authorID:
+          type: integer
