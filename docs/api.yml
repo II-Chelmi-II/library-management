@@ -15,15 +15,14 @@ paths:
       operationId: getBooks
       parameters:
         - $ref: '#/components/parameters/queryPagination'
+        - $ref: '#/components/parameters/pathPagination'
       responses:
         200:
-          description: The list of filtered books
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+          $ref: '#/components/responses/Response200'
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
     put:
       tags:
         - "Book"
@@ -38,13 +37,7 @@ paths:
                 $ref: '#/components/schemas/Book'
       responses:
         200:
-          description: The list of created or updated books
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
+          $ref: '#/components/responses/Response200'
   /books/{bookId}/authors/{authorId}:
     put:
       tags:
@@ -63,11 +56,7 @@ paths:
           required: true
       responses:
         200:
-          description: The updated book
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Book'
+          $ref: '#/components/responses/Response200'
   /books/authors:
     put:
       tags:
@@ -83,8 +72,8 @@ paths:
                items:
                 $ref: '#/components/schemas/UpdateBookAuthor'
       responses:
-        '200': 
-          description: Authors updated successfully
+        200:
+          $ref: '#/components/responses/Response200'
   /authors:
     get:
       tags:
@@ -100,15 +89,16 @@ paths:
           schema:
             type: string
         - $ref: '#/components/parameters/queryPagination'
+        - $ref: '#/components/parameters/pathPagination'
       responses:
         200:
-          description: The list of authors
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Author'
+          $ref: '#/components/responses/Response200'
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
     put:
       tags:
         - "Author"
@@ -124,13 +114,13 @@ paths:
                 $ref: '#/components/schemas/Author'
       responses:
         200:
-          description: The list of created or updated authors
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Author'
+          $ref: '#/components/responses/Response200'
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
     delete:
       tags:
         - "Author"
@@ -202,6 +192,35 @@ components:
       schema:
         type: integer
         default: 1
+  responses:
+    defaultResponse:
+      description: Default response structure
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  message:
+                    type: string
+              body:
+                type: object
+    Response200:
+      $ref: '#/components/responses/defaultResponse'
+      description: Response for HTTP 200 (OK)
+    Response400:
+      $ref: '#/components/responses/defaultResponse'
+      description: Response for HTTP 400 (Bad Request)
+    Response403:
+      $ref: '#/components/responses/defaultResponse'
+      description: Response for HTTP 403 (Forbidden)
+    Response500:
+      $ref: '#/components/responses/defaultResponse'
+      description: Response for HTTP 500 (Internal Server Error)
 
 # 4-a Oui, on peut gérer la pagination à travers les entêtes de la requête 
 # mais cette action n'est pas conseiller pour améliorer l'expérience l'utilisateur. 
