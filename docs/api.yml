@@ -70,6 +70,8 @@ paths:
                 $ref: '#/components/schemas/Book'
   /books/authors:
     put:
+      tags:
+        - "Book"
       summary: Update Book authors
       description: Update the authors of multiple books
       requestBody: 
@@ -97,6 +99,7 @@ paths:
           required: false
           schema:
             type: string
+        - $ref: '#/components/parameters/queryPagination'
       responses:
         200:
           description: The list of authors
