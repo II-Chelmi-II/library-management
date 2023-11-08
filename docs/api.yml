@@ -277,7 +277,7 @@ components:
     Topic:
       type: object
       properties:
-        id:
+        topicId:
           type: string
         topicName:
           type: string
