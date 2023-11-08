@@ -187,6 +187,28 @@ paths:
       responses:
         "200":
           description: Topic updated successfully
+  /authors/topics:
+    get:
+      tags:
+        - "Topics"
+      summary: Get topics for all authors
+      description: Retrieve topics for all authors
+      responses:
+        "200":
+          description: List of objects containing authorName, authorId, and topicName
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    authorName:
+                      type: string
+                    authorId:
+                      type: string
+                    topicName:
+                      type: string
   /topics:
     get:
       tags:
