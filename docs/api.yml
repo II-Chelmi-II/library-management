@@ -169,6 +169,24 @@ paths:
       responses:
         204:
           description: Authors deleted successfully
+  /books/topics:
+    put:
+      tags:
+        - "Topics"
+      summary: Update topic for multiple books
+      description: Update the topic of multiple books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UpdateBookTopic"
+
+      responses:
+        "200":
+          description: Topic updated successfully
   /topics:
     get:
       tags:
@@ -253,6 +271,13 @@ components:
           enum:
             - M
             - F
+    UpdateBookTopic:
+      type: object
+      properties:
+        bookId:
+          type: string
+        topicId:
+          type: string
     UpdateBookAuthor:
       type: object
       properties:
