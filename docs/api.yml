@@ -14,39 +14,7 @@ paths:
       description: The returned books are ordered by updated datetime.
       operationId: getBooks
       parameters:
-        - in: query
-          name: bookName
-          description: Filter return books by given name
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: releaseDateInterval
-          description: Filter books by release date interval
-          required: false
-          schema:
-            type: object
-            properties:
-              min:
-                type: string
-                format: date
-              max:
-                type: string
-                format: date
-        - in: query
-          name: page
-          description: Page number for pagination 
-          required: false
-          schema:
-            type: integer
-            default: 1
-        - in: query
-          name: pageSize
-          description: Number of items per page
-          required: false
-          schema:
-            type: integer
-            default: 50
+        - $ref: '#/components/parameters/queryPagination'
       responses:
         200:
           description: The list of filtered books
