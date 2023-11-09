@@ -65,7 +65,6 @@ paths:
                   $ref: '#/components/schemas/Book'
         400:
           $ref: '#/components/responses/Response400'
-          description: Bad Request
         403:
           $ref: '#/components/responses/Response403'
         500:
@@ -233,18 +232,72 @@ components:
           type: integer
         authorID:
           type: integer
-    ImportAuthor:
-      oneOf:
-        - $ref: '#/components/schemas/Author'
-        - type: array
-          items:
-            $ref: '#/components/schemas/Author'
+    ImportBookJSON:
+      type: object
+      properties:
+        bookName:
+          type: string
+        author:
+          $ref: '#/components/schemas/Author'
+        pageNumbers:
+          type: integer
+        topic:
+          type: string
+          enum:
+            - ROMANCE
+            - COMEDY
+            - OTHER
+        releaseDate:
+          type: string
+          format: date
+      required:
+        - bookName
+        - author
+        - pageNumbers
+        - topic
+        - releaseDate
+
+    ImportBookExcel:
+      type: object
+      properties:
+        file: # Assuming 'file' is the field name for the uploaded Excel file
+          type: string
+          format: binary
+      required:
+        - file
+
     ImportBook:
       oneOf:
-        - $ref: '#/components/schemas/Book'
-        - type: array
-          items:
-            $ref: '#/components/schemas/Book'
+        - $ref: '#/components/schemas/ImportBookJSON'
+        - $ref: '#/components/schemas/ImportBookExcel'
+  
+    ImportAuthorJSON:
+      type: object
+      properties:
+        authorName:
+          type: string
+        sex:
+          type: string
+          enum:
+            - M
+            - F
+      required:
+        - authorName
+        - sex
+
+    ImportAuthorExcel:
+      type: object
+      properties:
+        file: # Assuming 'file' is the field name for the uploaded Excel file
+          type: string
+          format: binary
+      required:
+        - file
+
+    ImportAuthor:
+      oneOf:
+        - $ref: '#/components/schemas/ImportAuthorJSON'
+        - $ref: '#/components/schemas/ImportAuthorExcel'
   parameters:
     queryPagination:
       name: page
