@@ -38,6 +38,38 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/Response200'
+  /books/import:
+    post:
+      tags:
+        - "Book"
+      summary: Import books from Excel or JSON
+      operationId: importBooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportBook'
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: List of imported books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+        400:
+          $ref: '#/components/responses/Response400'
+          description: Bad Request
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
   /books/{bookId}/authors/{authorId}:
     put:
       tags:
@@ -130,6 +162,32 @@ paths:
       responses:
         204:
           description: Authors deleted successfully
+  /authors/import:
+    post:
+      tags:
+        - "Author"
+      summary: Import authors
+      description: Import authors from Excel or JSON file.
+      operationId: importAuthors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportAuthor'
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          $ref: '#/components/responses/Response200'
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
 components:
   schemas:
     crupdateBook:
@@ -175,6 +233,18 @@ components:
           type: integer
         authorID:
           type: integer
+    ImportAuthor:
+      oneOf:
+        - $ref: '#/components/schemas/Author'
+        - type: array
+          items:
+            $ref: '#/components/schemas/Author'
+    ImportBook:
+      oneOf:
+        - $ref: '#/components/schemas/Book'
+        - type: array
+          items:
+            $ref: '#/components/schemas/Book'
   parameters:
     queryPagination:
       name: page
@@ -223,21 +293,13 @@ components:
                 type: object
     Response200:
       $ref: '#/components/responses/defaultResponse'
-      description: Response for HTTP 200 (OK)
+      description: OK
     Response400:
       $ref: '#/components/responses/defaultResponse'
-      description: Response for HTTP 400 (Bad Request)
+      description: Bad Request
     Response403:
       $ref: '#/components/responses/defaultResponse'
-      description: Response for HTTP 403 (Forbidden)
+      description: Forbidden
     Response500:
       $ref: '#/components/responses/defaultResponse'
-      description: Response for HTTP 500 (Internal Server Error)
-
-# 4-a Oui, on peut gérer la pagination à travers les entêtes de la requête 
-# mais cette action n'est pas conseiller pour améliorer l'expérience l'utilisateur. 
-
-# 4-b Utiliser les entêtes de requête pour la pagination n'est pas 
-# nécessaire car les paramètres de requête sont plus simples et efficaces. 
-# Les entêtes sont utiles dans des cas spécifiques mais peuvent 
-# compliquer l'expérience utilisateur. Il est préférable d'utilser les paramètres de requête pour la pagination.
+      description: Internal Server Error
