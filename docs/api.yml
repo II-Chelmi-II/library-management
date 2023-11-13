@@ -14,8 +14,8 @@ paths:
       description: The returned books are ordered by updated datetime.
       operationId: getBooks
       parameters:
-        - $ref: '#/components/parameters/queryPagination'
-        - $ref: '#/components/parameters/pathPagination'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
       responses:
         200:
           $ref: '#/components/responses/Response200'
@@ -123,8 +123,8 @@ paths:
           required: false
           schema:
             type: string
-        - $ref: '#/components/parameters/queryPagination'
-        - $ref: '#/components/parameters/pathPagination'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
       responses:
         200:
           $ref: '#/components/responses/Response200'
@@ -260,7 +260,6 @@ components:
         - pageNumbers
         - topic
         - releaseDate
-
     ImportBookExcel:
       type: object
       properties:
@@ -269,12 +268,10 @@ components:
           format: binary
       required:
         - file
-
     ImportBook:
       oneOf:
         - $ref: '#/components/schemas/ImportBookJSON'
         - $ref: '#/components/schemas/ImportBookExcel'
-  
     ImportAuthorJSON:
       type: object
       properties:
@@ -288,7 +285,6 @@ components:
       required:
         - authorName
         - sex
-
     ImportAuthorExcel:
       type: object
       properties:
@@ -297,66 +293,75 @@ components:
           format: binary
       required:
         - file
-
     ImportAuthor:
       oneOf:
         - $ref: '#/components/schemas/ImportAuthorJSON'
         - $ref: '#/components/schemas/ImportAuthorExcel'
-  parameters:
-    queryPagination:
-      name: page
-      in: query
-      description: Page number for pagination
-      required: false
-      schema:
-        type: object
-        properties:
-          page:
-            type: integer
-            default: 1
-          pageSize:
-            type: integer
-            default: 50
-    pathPagination:
-      name: page
-      in: path
-      description: Page number for pagination
-      required: true
-      schema:
-        type: object
-        properties:
-          page:
-            type: integer
-            default: 50
-          pageSize:
-            type: integer
-            default: 1
-  responses:
     defaultResponse:
-      description: Default response structure
+      type: object
+      properties:
+        status:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+        body:
+          type: object
+  responses:
+    Response200:
+      description: HTTP 200 (OK)
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              status:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                  message:
-                    type: string
-              body:
-                type: object
-    Response200:
-      $ref: '#/components/responses/defaultResponse'
-      description: OK
+            $ref: "#/components/schemas/defaultResponse"
+          example:
+            status:
+              code: 200
+              message: OK
     Response400:
-      $ref: '#/components/responses/defaultResponse'
-      description: Bad Request
+      description: HTTP 400 (Bad Request)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/defaultResponse"
+          example:
+            status:
+              code: 400
+              message: Bad Request
     Response403:
-      $ref: '#/components/responses/defaultResponse'
-      description: Forbidden
+      description: HTTP 403 (Forbidden)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/defaultResponse"
+          example:
+            status:
+              code: 403
+              message: Forbidden
     Response500:
-      $ref: '#/components/responses/defaultResponse'
-      description: Internal Server Error
+      description: HTTP 500 (Internal Server Error)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/defaultResponse"
+          example:
+            status:
+              code: 500
+              message: Internal Server Error'
+  parameters:
+    Page: 
+      in: query
+      name: page
+      schema:
+        type: integer
+        default: 1
+      required: false
+    PageSize:
+      in: query
+      name: pageSize
+      schema:
+        type: integer
+        default: 50
+      required: false
