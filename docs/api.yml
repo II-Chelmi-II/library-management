@@ -23,6 +23,8 @@ paths:
           $ref: '#/components/responses/Response400'
         403:
           $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
     put:
       tags:
         - "Book"
