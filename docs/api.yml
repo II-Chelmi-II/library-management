@@ -236,6 +236,52 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
+  /books/borrow:
+    post:
+      tags:
+        - "Book"
+      summary: Borrow a book
+      operationId: borrowBook
+      security:
+        - oAuthLibrary: [borrow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          description: Book borrowed successfully
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
+  /books/return:
+    post:
+      tags:
+        - "Book"
+      summary: Return a book
+      operationId: returnBook
+      security:
+        - oAuthLibrary: [return]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          description: Book returned successfully
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
   /books/borrowed:
     get:
       tags:
@@ -257,6 +303,52 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
+  /authors/add:
+    post:
+      tags:
+        - "Author"
+      summary: Add an author
+      operationId: addAuthor
+      security:
+        - oAuthLibrary: [add_author]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        200:
+          description: Author added successfully
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
+  /books/add:
+    post:
+      tags:
+        - "Book"
+      summary: Add a book
+      operationId: addBook
+      security:
+        - oAuthLibrary: [add_book]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        200:
+          description: Book added successfully
+        400:
+          $ref: '#/components/responses/Response400'
+        403:
+          $ref: '#/components/responses/Response403'
+        500:
+          $ref: '#/components/responses/Response500'
   /books/available:
     get:
       tags:
@@ -320,6 +412,18 @@ paths:
         500:
           $ref: "#/components/responses/Response500"
 components:
+  securitySchemes:
+    oAuthLibrary:
+      type: oauth2
+      description: Cette API utilise OAuth 2.0 pour gérer les autorisations.
+      flows:
+        implicit:
+          authorizationUrl: https://api.library.com/oauth2/authorize
+          scopes:
+            borrow: borrowing books
+            return: returning books
+            add_author: adding authors
+            add_book: adding books
   schemas:
     crupdateBook:
       type: object
