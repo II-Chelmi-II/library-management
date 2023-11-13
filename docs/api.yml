@@ -193,6 +193,132 @@ paths:
           $ref: '#/components/responses/Response403'
         500:
           $ref: '#/components/responses/Response500'
+  /loans:
+    post:
+      tags:
+        - "Loans"
+      summary: Borrow a book
+      description: Record a book loan by a visitor
+      requestBody:
+        description: Loan details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Loan"
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+    put:
+      tags:
+        - "Loans"
+      summary: Return a book
+      description: Record the return of a borrowed book by a visitor
+      requestBody:
+        description: Return details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Loan"
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /books/borrowed:
+    get:
+      tags:
+        - "Books"
+      summary: Get borrowed books
+      description: Get the list of books currently borrowed
+      responses:
+        200:
+          description: The list of borrowed books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /books/available:
+    get:
+      tags:
+        - "Books"
+      summary: Get available books
+      description: Get the list of books currently available for borrowing
+      responses:
+        200:
+          description: The list of available books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /visitors/{visitorId}/activities:
+    get:
+      tags:
+        - "Visitors"
+      summary: Get visitor activities
+      description: Get the list of activities performed by a visitor within a specified period
+      parameters:
+        - name: visitorId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Start date of the period
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: End date of the period
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        200:
+          description: The list of visitor activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VisitorActivity"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
 components:
   schemas:
     crupdateBook:
@@ -309,8 +435,54 @@ components:
               type: integer
             message:
               type: string
-        body:
-          type: object
+        body: {}
+    Visitor:
+      type: object
+      properties:
+        visitorId:
+          type: string
+        name:
+          type: string
+        reference:
+          type: string
+        activities:
+          type: array
+          items:
+            type: object
+            properties:
+              activityType:
+                type: string
+                enum:
+                  - BORROW
+                  - RETURN
+              bookId:
+                type: string
+              date:
+                type: string
+                format: date-time
+    VisitorActivity:
+      type: object
+      properties:
+        activityType:
+          type: string
+          enum:
+            - BORROW
+            - RETURN
+        bookId:
+          type: string
+        date:
+          type: string
+          format: date-time
+    Loan:
+      type: object
+      properties:
+        loanId:
+          type: string
+        bookId:
+          type: string
+        loanDate:
+          type: string
+          format: date-time
   responses:
     Response200:
       description: HTTP 200 (OK)
