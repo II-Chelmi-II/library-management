@@ -2,60 +2,230 @@ openapi: 3.0.3
 info:
   title: Library API
   version: 2.0.0
-  description: STD22001
+  description: STD22119 - STD22101
 servers:
   - url: https://library.com
+security:
+  - OAuth2: [read] # Par défaut, l'accès public
 paths:
   /books:
     get:
       tags:
-        - "Book"
+        - "Books"
       summary: Get all books
       description: The returned books are ordered by updated datetime.
       operationId: getBooks
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/PageSize'
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+        - in: query
+          name: bookName
+          description: Filter return books by given name
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: startReleaseDate
+          description: Filter books released on or after this date
+          required: false
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endReleaseDate
+          description: Filter books released on or before this date
+          required: false
+          schema:
+            type: string
+            format: date
       responses:
         200:
-          $ref: '#/components/responses/Response200'
+          description: The list of filtered books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
         400:
-          $ref: '#/components/responses/Response400'
+          $ref: "#/components/responses/Response400"
         403:
-          $ref: '#/components/responses/Response403'
+          $ref: "#/components/responses/Response403"
         500:
-          $ref: '#/components/responses/Response500'
+          $ref: "#/components/responses/Response500"
+
     put:
       tags:
-        - "Book"
-      summary: Create or update a list of books
-      operationId: crupdateBooks
+        - "Books"
+      summary: Update multiple books
+      description: Update information for multiple books
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Book'
-      responses:
-        200:
-          $ref: '#/components/responses/Response200'
-  /books/import:
-    post:
-      tags:
-        - "Book"
-      summary: Import books from Excel or JSON
-      operationId: importBooks
-      requestBody:
+        description: Import books in either Excel or JSON format
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImportBook'
+              $ref: "#/components/schemas/Book"
           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
             schema:
-              type: string
-              format: binary
+              $ref: "#/components/schemas/Book"
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /authors:
+    get:
+      tags:
+        - "Authors"
+      summary: Get all authors
+      description: Get all the authors in the database
+      operationId: Get Authors
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+      responses:
+        200:
+          description: The list of Author
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Author"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+    put:
+      tags:
+        - "Authors"
+      summary: Update author by id
+      description: Update information according to id
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Import authors in either Excel or JSON format
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Author"
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet: # MIME type for Excel
+            schema:
+              $ref: "#/components/schemas/Author"
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+    delete:
+      tags:
+        - "Authors"
+      summary: Delete author by id
+      description: Deleting an author by id
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /books/{bookId}/authors/{authorId}:
+    put:
+      tags:
+        - "Books"
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+          description: The updated book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /books/authors:
+    put:
+      tags:
+        - "Books"
+      summary: Update Book authors
+      description: Update the authors of multiple books
+      requestBody:
+        description: Import books in either Excel or JSON format
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookAuthor"
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              $ref: "#/components/schemas/UpdateBookAuthor"
+      responses:
+        200:
+          $ref: "#/components/responses/Response200"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+  /books/import:
+    post:
+      tags:
+        - "Books"
+      summary: Import books
+      description: Import a list of books
+      operationId: importBooks
+      security:
+        - OAuth2: [write]
+      requestBody:
+        description: Import books in either Excel or JSON format
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookImport"
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              $ref: "#/components/schemas/ExcelBookImport"
       responses:
         200:
           description: List of imported books
@@ -64,141 +234,56 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Book'
-            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
-              schema:
-                type: string
-                format: binary
+                  $ref: "#/components/schemas/Book"
         400:
-          $ref: '#/components/responses/Response400'
+          $ref: "#/components/responses/Response400"
         403:
-          $ref: '#/components/responses/Response403'
+          $ref: "#/components/responses/Response403"
         500:
-          $ref: '#/components/responses/Response500'
-  /books/{bookId}/authors/{authorId}:
-    put:
-      tags:
-        - "Book"
-      description: Associate a single book to an author
-      parameters:
-        - name: bookId
-          in: path
-          schema:
-            type: string
-          required: true
-        - name: authorId
-          in: path
-          schema:
-            type: string
-          required: true
-      responses:
-        200:
-          $ref: '#/components/responses/Response200'
-  /books/authors:
-    put:
-      tags:
-        - "Book"
-      summary: Update Book authors
-      description: Update the authors of multiple books
-      requestBody: 
-        required: true
-        content:
-            application/json:
-              schema: 
-               type: array
-               items:
-                $ref: '#/components/schemas/UpdateBookAuthor'
-      responses:
-        200:
-          $ref: '#/components/responses/Response200'
-  /authors:
-    get:
-      tags:
-        - "Author"
-      summary: Get authors
-      description: The returned authors filtered by name.
-      operationId: getAuthors
-      parameters:
-        - in: query
-          name: authorName
-          description: Filter authors by name
-          required: false
-          schema:
-            type: string
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/PageSize'
-      responses:
-        200:
-          $ref: '#/components/responses/Response200'
-        400:
-          $ref: '#/components/responses/Response400'
-        403:
-          $ref: '#/components/responses/Response403'
-        500:
-          $ref: '#/components/responses/Response500'
-    put:
-      tags:
-        - "Author"
-      summary: Update authors
-      description: Update the list of authors
-      operationId: updateAuthors
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Author'
-      responses:
-        200:
-          $ref: '#/components/responses/Response200'
-        400:
-          $ref: '#/components/responses/Response400'
-        403:
-          $ref: '#/components/responses/Response403'
-        500:
-          $ref: '#/components/responses/Response500'
-    delete:
-      tags:
-        - "Author"
-      summary: Delete authors
-      description: Delete authors from the list
-      operationId: deleteAuthors
-      responses:
-        204:
-          description: Authors deleted successfully
+          $ref: "#/components/responses/Response500"
   /authors/import:
     post:
       tags:
-        - "Author"
+        - "Authors"
       summary: Import authors
-      description: Import authors from Excel or JSON file.
+      description: Import a list of authors
+      security:
+        - OAuth2: [write]
       operationId: importAuthors
       requestBody:
+        description: Import authors in either Excel or JSON format
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImportAuthor'
+              $ref: "#/components/schemas/AuthorImport"
           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
             schema:
-              type: string
-              format: binary
+              $ref: "#/components/schemas/ExcelAuthorImport"
       responses:
         200:
-          $ref: '#/components/responses/Response200'
+          description: List of imported authors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Author"
         400:
-          $ref: '#/components/responses/Response400'
+          $ref: "#/components/responses/Response400"
         403:
-          $ref: '#/components/responses/Response403'
+          $ref: "#/components/responses/Response403"
         500:
-          $ref: '#/components/responses/Response500'
+          $ref: "#/components/responses/Response500"
+
   /loans:
     post:
       tags:
         - "Loans"
       summary: Borrow a book
       description: Record a book loan by a visitor
+      security:
+        - OAuth2: [write]
       requestBody:
         description: Loan details
         required: true
@@ -220,6 +305,8 @@ paths:
         - "Loans"
       summary: Return a book
       description: Record the return of a borrowed book by a visitor
+      security:
+        - OAuth2: [write]
       requestBody:
         description: Return details
         required: true
@@ -236,58 +323,42 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
-  /books/borrow:
-    post:
+
+  /loans/{loanId}:
+    get:
       tags:
-        - "Book"
-      summary: Borrow a book
-      operationId: borrowBook
-      security:
-        - oAuthLibrary: [borrow]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
+        - "Loans"
+      summary: Get loan details by ID
+      description: Get details about a specific loan
+      operationId: getLoanById
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
-          description: Book borrowed successfully
+          description: The loan details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Loan"
         400:
-          $ref: '#/components/responses/Response400'
+          $ref: "#/components/responses/Response400"
         403:
-          $ref: '#/components/responses/Response403'
+          $ref: "#/components/responses/Response403"
         500:
-          $ref: '#/components/responses/Response500'
-  /books/return:
-    post:
-      tags:
-        - "Book"
-      summary: Return a book
-      operationId: returnBook
-      security:
-        - oAuthLibrary: [return]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
-      responses:
-        200:
-          description: Book returned successfully
-        400:
-          $ref: '#/components/responses/Response400'
-        403:
-          $ref: '#/components/responses/Response403'
-        500:
-          $ref: '#/components/responses/Response500'
+          $ref: "#/components/responses/Response500"
+
   /books/borrowed:
     get:
       tags:
         - "Books"
       summary: Get borrowed books
       description: Get the list of books currently borrowed
+      security:
+        - OAuth2: [write]
       responses:
         200:
           description: The list of borrowed books
@@ -303,58 +374,15 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
-  /authors/add:
-    post:
-      tags:
-        - "Author"
-      summary: Add an author
-      operationId: addAuthor
-      security:
-        - oAuthLibrary: [add_author]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Author'
-      responses:
-        200:
-          description: Author added successfully
-        400:
-          $ref: '#/components/responses/Response400'
-        403:
-          $ref: '#/components/responses/Response403'
-        500:
-          $ref: '#/components/responses/Response500'
-  /books/add:
-    post:
-      tags:
-        - "Book"
-      summary: Add a book
-      operationId: addBook
-      security:
-        - oAuthLibrary: [add_book]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
-      responses:
-        200:
-          description: Book added successfully
-        400:
-          $ref: '#/components/responses/Response400'
-        403:
-          $ref: '#/components/responses/Response403'
-        500:
-          $ref: '#/components/responses/Response500'
+
   /books/available:
     get:
       tags:
         - "Books"
       summary: Get available books
       description: Get the list of books currently available for borrowing
+      security:
+        - OAuth2: [read]
       responses:
         200:
           description: The list of available books
@@ -370,12 +398,65 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
+
+  /visitors:
+    get:
+      tags:
+        - "Visitors"
+      summary: Get all visitors
+      description: Get a list of all visitors
+      operationId: getVisitors
+      responses:
+        200:
+          description: The list of visitors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Visitor"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+
+  /visitors/{visitorId}:
+    get:
+      tags:
+        - "Visitors"
+      summary: Get visitor by ID
+      description: Get information about a specific visitor
+      operationId: getVisitorById
+      parameters:
+        - name: visitorId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The visitor details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Visitor"
+        400:
+          $ref: "#/components/responses/Response400"
+        403:
+          $ref: "#/components/responses/Response403"
+        500:
+          $ref: "#/components/responses/Response500"
+
   /visitors/{visitorId}/activities:
     get:
       tags:
         - "Visitors"
       summary: Get visitor activities
       description: Get the list of activities performed by a visitor within a specified period
+      security:
+        - OAuth2: [read]
       parameters:
         - name: visitorId
           in: path
@@ -411,72 +492,52 @@ paths:
           $ref: "#/components/responses/Response403"
         500:
           $ref: "#/components/responses/Response500"
+
 components:
   securitySchemes:
-    oAuthLibrary:
+    OAuth2:
       type: oauth2
-      description: Cette API utilise OAuth 2.0 pour gérer les autorisations.
       flows:
         implicit:
-          authorizationUrl: https://api.library.com/oauth2/authorize
+          authorizationUrl: https://auth-server.com/oauth/authorize
           scopes:
-            borrow: borrowing books
-            return: returning books
-            add_author: adding authors
-            add_book: adding books
+            read: Grants read access # public
+            write: Grants write access # admin
+
   schemas:
-    crupdateBook:
-      type: object
-      properties:
-        id:
-          type: string
-        bookName:
-          type: string
-        pageNumbers:
-          type: integer
-        topic:
-          type: string
-          enum:
-            - ROMANCE
-            - COMEDY
-            - OTHER
-        releaseDate:
-          type: string
-          format: date
     Book:
       allOf:
-        - $ref: '#/components/schemas/crupdateBook'
-      properties:
-        author:
-          $ref: '#/components/schemas/Author'
+        - $ref: "#/components/schemas/CrupdateBook"
+        - type: object
+          properties:
+            author:
+              $ref: "#/components/schemas/Author"
+            status:
+              type: string
+              enum:
+                - AVAILABLE
+                - BORROWED
+
     Author:
       type: object
       properties:
-        id:
+        authorId:
           type: string
         name:
           type: string
         sex:
-          type: string
           enum:
             - M
             - F
-    UpdateBookAuthor:
+    CrupdateBook:
       type: object
       properties:
-        bookID:
-          type: integer
-        authorID:
-          type: integer
-    ImportBookJSON:
-      type: object
-      properties:
+        bookId:
+          type: string
         bookName:
           type: string
-        author:
-          $ref: '#/components/schemas/Author'
         pageNumbers:
-          type: integer
+          type: string
         topic:
           type: string
           enum:
@@ -486,49 +547,37 @@ components:
         releaseDate:
           type: string
           format: date
-      required:
-        - bookName
-        - author
-        - pageNumbers
-        - topic
-        - releaseDate
-    ImportBookExcel:
+
+    UpdateBookAuthor:
       type: object
       properties:
-        file: # Assuming 'file' is the field name for the uploaded Excel file
+        bookId:
           type: string
-          format: binary
-      required:
-        - file
-    ImportBook:
+        authorId:
+          type: string
+
+    AuthorImport:
       oneOf:
-        - $ref: '#/components/schemas/ImportBookJSON'
-        - $ref: '#/components/schemas/ImportBookExcel'
-    ImportAuthorJSON:
-      type: object
-      properties:
-        authorName:
-          type: string
-        sex:
-          type: string
-          enum:
-            - M
-            - F
-      required:
-        - authorName
-        - sex
-    ImportAuthorExcel:
-      type: object
-      properties:
-        file: # Assuming 'file' is the field name for the uploaded Excel file
-          type: string
-          format: binary
-      required:
-        - file
-    ImportAuthor:
+        - $ref: "#/components/schemas/ExcelAuthorImport"
+        - $ref: "#/components/schemas/JSONAuthorImport"
+
+    ExcelAuthorImport:
+      $ref: "#/components/schemas/Author"
+
+    JSONAuthorImport:
+      $ref: "#/components/schemas/Author"
+
+    BookImport:
       oneOf:
-        - $ref: '#/components/schemas/ImportAuthorJSON'
-        - $ref: '#/components/schemas/ImportAuthorExcel'
+        - $ref: "#/components/schemas/ExcelBookImport"
+        - $ref: "#/components/schemas/JSONBookImport"
+
+    ExcelBookImport:
+      $ref: "#/components/schemas/Book"
+
+    JSONBookImport:
+      $ref: "#/components/schemas/Book"
+
     defaultResponse:
       type: object
       properties:
@@ -540,6 +589,7 @@ components:
             message:
               type: string
         body: {}
+
     Visitor:
       type: object
       properties:
@@ -564,6 +614,7 @@ components:
               date:
                 type: string
                 format: date-time
+
     VisitorActivity:
       type: object
       properties:
@@ -577,6 +628,7 @@ components:
         date:
           type: string
           format: date-time
+
     Loan:
       type: object
       properties:
@@ -587,6 +639,7 @@ components:
         loanDate:
           type: string
           format: date-time
+
   responses:
     Response200:
       description: HTTP 200 (OK)
@@ -627,16 +680,17 @@ components:
           example:
             status:
               code: 500
-              message: Internal Server Error'
+              message: Internal Server Error
+
   parameters:
-    Page: 
+    page:
       in: query
       name: page
       schema:
         type: integer
         default: 1
       required: false
-    PageSize:
+    pageSize:
       in: query
       name: pageSize
       schema:
